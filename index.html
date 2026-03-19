@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Folha Ponto — Analisador</title>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script defer src="./vendor/pdfjs/pdf.js"></script>
   <style>
     :root{
@@ -515,6 +516,7 @@
         <label class="label-btn" for="pdfFile">Selecionar PDF</label>
 
         <button class="btn-orange btn-disabled" id="btnAnalyze" disabled>Analisar PDF</button>
+        <button class="btn-ghost btn-disabled" id="btnExcel" disabled>Gerar Excel</button>
         <button class="btn-ghost" id="btnClear">Limpar</button>
       </div>
     </div>
@@ -1480,6 +1482,153 @@
     });
   }
 
+  function autoFitColumns(jsonRows){
+    if(!jsonRows.length) return [];
+    const keys = Object.keys(jsonRows[0]);
+    return keys.map(key => {
+      let max = key.length;
+      jsonRows.forEach(row => {
+        const val = row[key] == null ? "" : String(row[key]);
+        if(val.length > max) max = val.length;
+      });
+      return { wch: Math.min(max + 2, 40) };
+    });
+  }
+
+  function buildExcelData(employees){
+    const resumo = [];
+    const heExcedidas = [];
+    const heSabado = [];
+    const heFeriado = [];
+    const faltas = [];
+    const inconsistencias = [];
+
+    (employees || []).forEach(emp => {
+      resumo.push({
+        "Nome": emp.name || "",
+        "Matrícula": emp.code || "",
+        "Centro de Custo": emp.costCenter || "",
+        "Empresa": emp.company || "",
+        "Dias Trabalhados": emp.daysWorked ?? 0,
+        "Total de Faltas": emp.totalAbsences ?? 0,
+        "Faltas Injustificadas Consecutivas": emp.unjustifiedAbsences ?? 0,
+        "Qtd HE Excedidas": (emp.extrasBad || []).length,
+        "Qtd HE Sábado": (emp.saturdayExtras || []).length,
+        "Qtd HE Feriado": (emp.holidayExtras || []).length,
+        "Qtd Inconsistências": (emp.incompletePunches || []).length
+      });
+
+      (emp.extrasBad || []).forEach(item => {
+        const mins = hhmmToMinutes(item.time);
+        heExcedidas.push({
+          "Nome": emp.name || "",
+          "Matrícula": emp.code || "",
+          "Centro de Custo": emp.costCenter || "",
+          "Empresa": emp.company || "",
+          "Data": item.date || "",
+          "Dia da Semana": item.weekday || "",
+          "Hora Extra": item.time || "",
+          "Limite": EXTRA_LIMIT_LABEL,
+          "Excedido em": mins > EXTRA_LIMIT_MIN ? minutesToHHMM(mins - EXTRA_LIMIT_MIN) : "00:00"
+        });
+      });
+
+      (emp.saturdayExtras || []).forEach(item => {
+        heSabado.push({
+          "Nome": emp.name || "",
+          "Matrícula": emp.code || "",
+          "Centro de Custo": emp.costCenter || "",
+          "Empresa": emp.company || "",
+          "Data": item.date || "",
+          "Dia da Semana": item.weekday || "",
+          "Hora": item.time || "",
+          "Observação": item.note || "SÁBADO"
+        });
+      });
+
+      (emp.holidayExtras || []).forEach(item => {
+        heFeriado.push({
+          "Nome": emp.name || "",
+          "Matrícula": emp.code || "",
+          "Centro de Custo": emp.costCenter || "",
+          "Empresa": emp.company || "",
+          "Data": item.date || "",
+          "Dia da Semana": item.weekday || "",
+          "Hora": item.time || "",
+          "Observação": item.note || "FERIADO"
+        });
+      });
+
+      (emp.absences || []).forEach(item => {
+        faltas.push({
+          "Nome": emp.name || "",
+          "Matrícula": emp.code || "",
+          "Centro de Custo": emp.costCenter || "",
+          "Empresa": emp.company || "",
+          "Data": item.date || "",
+          "Dia da Semana": item.weekday || "",
+          "Faltas Injustificadas Consecutivas": emp.unjustifiedAbsences ?? 0
+        });
+      });
+
+      (emp.incompletePunches || []).forEach(item => {
+        inconsistencias.push({
+          "Nome": emp.name || "",
+          "Matrícula": emp.code || "",
+          "Centro de Custo": emp.costCenter || "",
+          "Empresa": emp.company || "",
+          "Data": item.date || "",
+          "Dia da Semana": item.weekday || "",
+          "Tipo": item.label || "",
+          "Observação": item.note || ""
+        });
+      });
+    });
+
+    return { resumo, heExcedidas, heSabado, heFeriado, faltas, inconsistencias };
+  }
+
+  function addSheet(workbook, sheetName, rows){
+    const safeRows = rows.length ? rows : [{ "Sem dados": "" }];
+    const ws = XLSX.utils.json_to_sheet(safeRows);
+    ws["!cols"] = autoFitColumns(safeRows);
+    XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+  }
+
+  function exportExcel(){
+    if(!window.XLSX){
+      setMsg("Erro: biblioteca do Excel não carregou.");
+      return;
+    }
+
+    if(!allEmployees || !allEmployees.length){
+      setMsg("Nenhum dado para exportar. Analise um PDF primeiro.");
+      return;
+    }
+
+    try{
+      const workbook = XLSX.utils.book_new();
+      const data = buildExcelData(allEmployees);
+
+      addSheet(workbook, "Resumo", data.resumo);
+      addSheet(workbook, "HE Excedidas", data.heExcedidas);
+      addSheet(workbook, "HE Sabado", data.heSabado);
+      addSheet(workbook, "HE Feriado", data.heFeriado);
+      addSheet(workbook, "Faltas", data.faltas);
+      addSheet(workbook, "Inconsistencias", data.inconsistencias);
+
+      const now = new Date();
+      const fileName =
+        `relatorio_folha_ponto_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}.xlsx`;
+
+      XLSX.writeFile(workbook, fileName);
+      setMsg("Excel gerado com sucesso.");
+    }catch(err){
+      console.error(err);
+      setMsg("Erro ao gerar o Excel.");
+    }
+  }
+
   let currentFile = null;
 
   $("searchEmployee").addEventListener("input", ()=>{
@@ -1506,6 +1655,8 @@
       setMsg("Selecione um arquivo PDF válido.");
       $("btnAnalyze").disabled = true;
       $("btnAnalyze").classList.add("btn-disabled");
+      $("btnExcel").disabled = true;
+      $("btnExcel").classList.add("btn-disabled");
       return;
     }
 
@@ -1525,6 +1676,8 @@
     setMsg("");
     $("btnAnalyze").disabled = true;
     $("btnAnalyze").classList.add("btn-disabled");
+    $("btnExcel").disabled = true;
+    $("btnExcel").classList.add("btn-disabled");
   });
 
   $("btnAnalyze").addEventListener("click", async ()=>{
@@ -1543,14 +1696,22 @@
       const employees = parseEmployees(text);
       allEmployees = employees;
       render(allEmployees);
-      setMsg("");
+
+      $("btnExcel").disabled = allEmployees.length === 0;
+      $("btnExcel").classList.toggle("btn-disabled", allEmployees.length === 0);
+
+      setMsg(allEmployees.length ? "Análise concluída com sucesso." : "Nenhum colaborador encontrado para as regras definidas.");
     }catch(err){
       console.error(err);
       setMsg("Erro ao analisar o PDF. (Se o PDF for escaneado como imagem, precisa OCR.)");
+      $("btnExcel").disabled = true;
+      $("btnExcel").classList.add("btn-disabled");
     }finally{
       setLoading(false);
     }
   });
+
+  $("btnExcel").addEventListener("click", exportExcel);
 </script>
 </body>
 </html>
