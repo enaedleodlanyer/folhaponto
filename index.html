@@ -7,6 +7,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script defer src="./vendor/pdfjs/pdf.js"></script>
+
   <style>
     :root{
       --navy:#0b1f3b;
@@ -31,6 +32,10 @@
       --abs-bd:#ffd27a;
       --abs-tx:#8a4b00;
 
+      --inc-bg:#f5ebe3;
+      --inc-bd:#c8a58a;
+      --inc-tx:#6f4e37;
+
       --sat-bg:#e8f1ff;
       --sat-bd:#93c5fd;
       --sat-tx:#1d4ed8;
@@ -48,6 +53,21 @@
         radial-gradient(700px 400px at 90% 10%, rgba(255,122,0,.10), transparent 55%),
         var(--bg);
       color:var(--text);
+      position:relative;
+      min-height:100vh;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:url("img/logo.png");
+      background-repeat:no-repeat;
+      background-position:center center;
+      background-size:420px auto;
+      opacity:.04;
+      pointer-events:none;
+      z-index:0;
     }
 
     .topbar{
@@ -56,30 +76,58 @@
       padding:18px 0;
       box-shadow: 0 10px 24px rgba(0,0,0,.12);
     }
+
     .wrap{
       max-width:1100px;
       margin:0 auto;
       padding:22px 18px 60px;
     }
+
     .topbar .wrap{
-      padding-top:0;padding-bottom:0;
+      padding-top:0;
+      padding-bottom:0;
       display:flex;
       align-items:center;
-      justify-content:space-between;
+      justify-content:center;
       gap:12px;
     }
-    .brand{ display:flex; align-items:center; gap:12px; }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      width:100%;
+      text-align:center;
+    }
+
     .logo{
-      width:44px;height:44px;border-radius:14px;
+      width:44px;
+      height:44px;
+      border-radius:14px;
       background:
         linear-gradient(135deg, var(--pool), rgba(0,188,212,.25)),
         radial-gradient(18px 18px at 70% 30%, rgba(255,255,255,.65), transparent 70%);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
-      display:grid;place-items:center;
+      display:grid;
+      place-items:center;
       font-weight:900;
       letter-spacing:.5px;
     }
-    .brand h1{ margin:0; font-size:18px; font-weight:900; line-height:1.1; }
+
+    .logo-img{
+      height:50px;
+      width:auto;
+      object-fit:contain;
+      display:block;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+      line-height:1.1;
+    }
 
     .sub{
       margin:14px 0 18px;
@@ -97,18 +145,34 @@
       flex-wrap:wrap;
       gap:12px;
       align-items:center;
-      justify-content:space-between;
+      justify-content:center;
     }
-    .panel-left{ min-width:260px; }
-    .panel-title{ font-weight:900; margin:0; color:var(--navy); }
-    .panel-hint{ margin:6px 0 0; color:var(--muted); font-size:12px; }
+
+    .panel-left{
+      min-width:260px;
+      flex:1 1 100%;
+      text-align:center;
+    }
+
+    .panel-title{
+      font-weight:900;
+      margin:0;
+      color:var(--navy);
+    }
+
+    .panel-hint{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
 
     .btns{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       align-items:center;
-      justify-content:flex-end;
+      justify-content:center;
+      flex:1 1 100%;
     }
 
     .control{
@@ -120,6 +184,7 @@
       border-radius:12px;
       padding:8px 10px;
     }
+
     .control input,
     .control select{
       border:0;
@@ -145,20 +210,29 @@
       cursor:pointer;
       transition: transform .05s ease, filter .15s ease;
     }
-    button:active{ transform: translateY(1px); }
+
+    button:active{
+      transform: translateY(1px);
+    }
 
     .btn-orange{
       background: linear-gradient(180deg, var(--orange), #ff5e00);
       color:#fff;
     }
-    .btn-orange:hover{ filter:brightness(1.05); }
+
+    .btn-orange:hover{
+      filter:brightness(1.05);
+    }
 
     .btn-ghost{
       background:#fff;
       border:1px solid var(--border);
       color:var(--navy);
     }
-    .btn-ghost:hover{ filter:brightness(0.98); }
+
+    .btn-ghost:hover{
+      filter:brightness(0.98);
+    }
 
     .btn-disabled{
       background:#e9eef5;
@@ -173,6 +247,7 @@
       height:1px;
       opacity:0;
     }
+
     .label-btn{
       display:inline-block;
       text-align:center;
@@ -186,12 +261,28 @@
       color:#fff;
       user-select:none;
     }
-    .label-btn:active{ transform: translateY(1px); }
-    .label-btn:hover{ filter:brightness(1.08); }
 
-    .msg{ margin-top:10px; font-size:13px; color:#0f172a; }
+    .label-btn:active{
+      transform: translateY(1px);
+    }
 
-    .cards{ margin-top:18px; display:flex; flex-direction:column; gap:16px; }
+    .label-btn:hover{
+      filter:brightness(1.08);
+    }
+
+    .msg{
+      margin-top:10px;
+      font-size:13px;
+      color:#0f172a;
+      text-align:center;
+    }
+
+    .cards{
+      margin-top:18px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
 
     .card{
       background:var(--card);
@@ -202,6 +293,7 @@
       position:relative;
       overflow:hidden;
     }
+
     .card:before{
       content:"";
       position:absolute;
@@ -211,7 +303,10 @@
         radial-gradient(520px 220px at 90% 20%, rgba(255,122,0,.08), transparent 55%);
       pointer-events:none;
     }
-    .card > *{ position:relative; }
+
+    .card > *{
+      position:relative;
+    }
 
     .card-head{
       display:flex;
@@ -220,6 +315,7 @@
       align-items:flex-start;
       flex-wrap:wrap;
     }
+
     .name{
       font-size:18px;
       font-weight:900;
@@ -228,13 +324,38 @@
       letter-spacing:.2px;
       text-transform:uppercase;
     }
+
     .meta{
       margin-top:6px;
       color:var(--muted);
       font-size:13px;
       line-height:1.35;
     }
-    .meta b{ color:#0f172a; }
+
+    .meta b{
+      color:#0f172a;
+    }
+
+    .meta-grid{
+      margin-top:8px;
+      display:grid;
+      grid-template-columns:170px 1fr;
+      gap:6px 12px;
+      align-items:start;
+    }
+
+    .meta-label{
+      color:#7b8aa5;
+      font-weight:800;
+      font-size:13px;
+    }
+
+    .meta-value{
+      color:#0f172a;
+      font-weight:700;
+      font-size:13px;
+      word-break:break-word;
+    }
 
     .badges{
       display:flex;
@@ -242,6 +363,7 @@
       align-items:center;
       flex-wrap:wrap;
     }
+
     .badge{
       font-size:12px;
       font-weight:900;
@@ -252,16 +374,25 @@
       color:var(--navy);
       white-space:nowrap;
     }
+
     .badge-red{
       background:var(--bad-bg);
       color:var(--bad-tx);
       border-color:var(--bad-bd);
     }
+
     .badge-abs{
       background:var(--abs-bg);
       color:var(--abs-tx);
       border-color:var(--abs-bd);
     }
+
+    .badge-inc{
+      background:var(--inc-bg);
+      color:var(--inc-tx);
+      border-color:var(--inc-bd);
+    }
+
     .badge-sat{
       background:var(--sat-bg);
       color:var(--sat-tx);
@@ -274,6 +405,7 @@
       grid-template-columns: repeat(4, 1fr);
       gap:10px;
     }
+
     .stat{
       background:rgba(255,255,255,.75);
       border:1px solid var(--border);
@@ -281,23 +413,33 @@
       padding:12px;
       backdrop-filter: blur(6px);
     }
+
     .stat .label{
       font-size:11px;
       color:#7b8aa5;
       margin-bottom:6px;
       font-weight:800;
     }
+
     .stat .val{
       font-size:16px;
       font-weight:900;
       color:#0f172a;
     }
+
     .stat.warn{
       background:var(--abs-bg);
       border-color:var(--abs-bd);
     }
-    .stat.warn .label{ color:#8a4b00; }
-    .stat.warn .val{ color:#7c2d12; }
+
+    .stat.warn .label{
+      color:#8a4b00;
+    }
+
+    .stat.warn .val{
+      color:#7c2d12;
+    }
+
     .mini{
       margin-top:6px;
       font-size:11px;
@@ -319,6 +461,7 @@
       gap:8px;
       user-select:none;
     }
+
     .chev{
       width:16px;
       display:inline-block;
@@ -326,7 +469,10 @@
       font-weight:900;
       color:var(--navy);
     }
-    .chev.open{ transform:rotate(180deg); }
+
+    .chev.open{
+      transform:rotate(180deg);
+    }
 
     .tabs{
       margin-top:12px;
@@ -338,6 +484,7 @@
       border:1px solid rgba(0,188,212,.25);
       flex-wrap:wrap;
     }
+
     .tab{
       border:0;
       border-radius:12px;
@@ -348,6 +495,7 @@
       color:#355a7a;
       cursor:pointer;
     }
+
     .tab.active{
       background:#fff;
       border:1px solid var(--border);
@@ -361,7 +509,9 @@
       grid-template-columns: repeat(4, 1fr);
       gap:10px;
     }
+
     .tile{
+      position:relative;
       border-radius:16px;
       padding:12px;
       min-height:82px;
@@ -369,31 +519,74 @@
       color:var(--ok-tx);
       border:1px solid var(--ok-bd);
     }
+
     .tile.red{
       background:var(--bad-bg);
       color:var(--bad-tx);
       border-color:var(--bad-bd);
     }
+
     .tile.abs{
       background:var(--abs-bg);
       color:var(--abs-tx);
       border-color:var(--abs-bd);
     }
+
+    .tile.inc{
+      background:var(--inc-bg);
+      color:var(--inc-tx);
+      border-color:var(--inc-bd);
+    }
+
     .tile.sat{
       background:var(--sat-bg);
       color:var(--sat-tx);
       border-color:var(--sat-bd);
     }
+
     .tile .date{
       font-size:12px;
       font-weight:900;
       opacity:.9;
     }
+
     .tile .time{
       margin-top:8px;
       font-size:18px;
       font-weight:900;
     }
+    .tile .he-percent{
+      position:absolute;
+      top:8px;
+      right:10px;
+      font-size:11px;
+      font-weight:700;
+      opacity:.68;
+      letter-spacing:.2px;
+      line-height:1;
+    }
+
+    .tile.red .he-percent{
+      color:var(--bad-tx);
+    }
+
+    .tile.sat .he-percent{
+      color:var(--sat-tx);
+    }
+
+    .tile.abs .he-percent{
+      color:var(--abs-tx);
+    }
+
+    .tile.inc .he-percent{
+      color:var(--inc-tx);
+    }
+
+    .tile:not(.red):not(.sat):not(.abs):not(.inc) .he-percent{
+      color:var(--ok-tx);
+    }
+
+
     .tile .warn{
       margin-top:8px;
       font-size:12px;
@@ -414,16 +607,25 @@
       gap:10px;
       align-items:center;
     }
+
     .alert.red{
       background:var(--bad-bg);
       border:1px solid var(--bad-bd);
       color:var(--bad-tx);
     }
+
     .alert.abs{
       background:var(--abs-bg);
       border:1px solid var(--abs-bd);
       color:var(--abs-tx);
     }
+
+    .alert.inc{
+      background:var(--inc-bg);
+      border:1px solid var(--inc-bd);
+      color:var(--inc-tx);
+    }
+
     .alert.sat{
       background:var(--sat-bg);
       border:1px solid var(--sat-bd);
@@ -433,13 +635,19 @@
     .overlay{
       position:fixed;
       inset:0;
-      background:rgba(11,31,59,.28);
+      background:transparent;
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
       display:none;
       align-items:center;
       justify-content:center;
       z-index:9999;
     }
-    .overlay.on{ display:flex; }
+
+    .overlay.on{
+      display:flex;
+    }
+
     .modal{
       width:380px;
       background:#fff;
@@ -451,49 +659,166 @@
       gap:12px;
       align-items:center;
     }
+
     .spinner{
-      width:36px; height:36px;
+      width:36px;
+      height:36px;
       border-radius:999px;
       border:4px solid #e5e7eb;
       border-top-color:var(--pool);
       animation:spin 1s linear infinite;
     }
-    @keyframes spin{ to{ transform:rotate(360deg);} }
+
+    .legend-overlay{
+      position:fixed;
+      top:140px;
+      right:18px;
+      left:auto;
+      bottom:auto;
+      background:transparent;
+      display:none;
+      z-index:10000;
+      width:auto;
+      height:auto;
+    }
+
+    .legend-overlay.active{
+      display:block;
+    }
+    .topbar,
+    .wrap,
+    .overlay{
+      position:relative;
+      z-index:1;
+    }
+
+
+    .legend-modal{
+      background:#fff;
+      border-radius:20px;
+      padding:18px;
+      width:320px;
+      max-width:calc(100vw - 36px);
+      box-shadow:0 20px 50px rgba(0,0,0,.18);
+      border:1px solid var(--border);
+    }
+
+    .legend-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:15px;
+    }
+
+    .legend-header h2{
+      margin:0;
+      font-size:20px;
+      color:var(--navy);
+      font-weight:900;
+    }
+
+    #closeLegend{
+      cursor:pointer;
+      font-size:22px;
+      font-weight:bold;
+      color:#64748b;
+      line-height:1;
+    }
+
+    .legend-content{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      margin-bottom:20px;
+    }
+
+    .legend-row{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+      color:var(--text);
+      font-size:15px;
+    }
+
+    .dot{
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      display:inline-block;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,.45), 0 2px 6px rgba(0,0,0,.15);
+      border:1px solid rgba(0,0,0,.08);
+      flex-shrink:0;
+    }
+
+    .dot.green{ background:#22c55e; }
+    .dot.red{ background:#ef4444; }
+    .dot.blue{ background:#3b82f6; }
+    .dot.yellow{ background:#facc15; }
+    .dot.brown{ background:#8b5e3c; }
+    .dot.orange{ background:#fb923c; }
+
+    .legend-footer{
+      display:none;
+    }
+
+    @keyframes spin{
+      to{ transform:rotate(360deg);}
+    }
+
+
+    @media (max-width: 980px){
+      .legend-overlay{
+        top:auto;
+        right:12px;
+        bottom:12px;
+      }
+
+      .legend-modal{
+        width:290px;
+      }
+    }
 
     @media (max-width: 980px){
       .stats{ grid-template-columns:1fr 1fr; }
       .grid{ grid-template-columns: repeat(2, 1fr); }
     }
+
+    @media (max-width: 700px){
+      .meta-grid{
+        grid-template-columns:1fr;
+        gap:4px;
+      }
+
+      .meta-label{
+        margin-top:4px;
+      }
+    }
+
     @media (max-width: 520px){
       .stats{ grid-template-columns:1fr; }
+      .legend-row{ font-size:14px; }
+      .legend-header h2{ font-size:18px; }
     }
-  </style>
+  .pin-destaque{color:#b91c1c !important;}
+</style>
 </head>
 
 <body>
   <div class="topbar">
     <div class="wrap">
       <div class="brand">
-        <div class="logo">FP</div>
+        <img src="img/logo.png" class="logo-img" alt="Logo STN">
         <div>
           <h1>Folha Ponto — Relatório Inteligente</h1>
         </div>
-      </div>
-      <div style="font-weight:900; opacity:.9; font-size:12px;">
-        HE &gt; 01:12 | Faltas injust. ≥ 11 consecutivas
       </div>
     </div>
   </div>
 
   <div class="wrap">
-    <p class="sub">
-      Selecione o PDF, clique em <b>Analisar PDF</b> e o sistema mostrará apenas os colaboradores que infringem as regras.
-    </p>
-
     <div class="panel">
       <div class="panel-left">
-        <p class="panel-title">1) Selecione o PDF • 2) Clique em “Analisar PDF”</p>
-        <p class="panel-hint">Mostra apenas quem excedeu HE, teve HE de sábado/feriado ou faltas injustificadas ≥ 11 consecutivas.</p>
         <div class="msg" id="msg"></div>
       </div>
 
@@ -512,11 +837,15 @@
           </select>
         </div>
 
-        <input id="pdfFile" type="file" accept=".pdf,application/pdf" class="file-hidden" />
-        <label class="label-btn" for="pdfFile">Selecionar PDF</label>
+        <input id="pdfFile" type="file" accept=".pdf,application/pdf" class="file-hidden" multiple />
+        <label class="label-btn" for="pdfFile">Selecionar PDF(s) folha</label>
+
+        <input id="pinPdfFile" type="file" accept=".pdf,application/pdf" class="file-hidden" />
+        <label class="label-btn" for="pinPdfFile">Selecionar PDF PIN</label>
 
         <button class="btn-orange btn-disabled" id="btnAnalyze" disabled>Analisar PDF</button>
         <button class="btn-ghost btn-disabled" id="btnExcel" disabled>Gerar Excel</button>
+        <button class="btn-ghost" id="btnLegend">Ver legenda</button>
         <button class="btn-ghost" id="btnClear">Limpar</button>
       </div>
     </div>
@@ -530,6 +859,51 @@
       <div style="min-width:0;">
         <div style="font-weight:900; color:var(--navy);" id="loadingTitle">Carregando...</div>
         <div style="color:#6b7280;font-size:13px;margin-top:2px;" id="loadingSub">Analisando PDF</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend-overlay" id="legendOverlay">
+    <div class="legend-modal">
+      <div class="legend-header">
+        <h2>Legenda do Relatório</h2>
+        <span id="closeLegend">✕</span>
+      </div>
+
+      <div class="legend-content">
+        <div class="legend-row">
+          <span class="dot green"></span>
+          Hora extra dentro do limite
+        </div>
+
+        <div class="legend-row">
+          <span class="dot red"></span>
+          Hora extra excedida
+        </div>
+
+        <div class="legend-row">
+          <span class="dot blue"></span>
+          Hora extra em sábado
+        </div>
+
+        <div class="legend-row">
+          <span class="dot yellow"></span>
+          Faltas
+        </div>
+
+        <div class="legend-row">
+          <span class="dot brown"></span>
+          Inconsistências
+        </div>
+
+        <div class="legend-row">
+          <span class="dot orange"></span>
+          Hora extra em feriado
+        </div>
+      </div>
+
+      <div class="legend-footer">
+        <button id="btnCloseLegend" class="btn-orange">Fechar</button>
       </div>
     </div>
   </div>
@@ -558,7 +932,9 @@
     return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
   }
 
-  function setMsg(text){ $("msg").textContent = text || ""; }
+  function setMsg(text){
+    $("msg").textContent = text || "";
+  }
 
   function setLoading(on, title="Carregando...", sub="Analisando PDF"){
     $("overlay").classList.toggle("on", !!on);
@@ -567,18 +943,33 @@
   }
 
   function escapeHtml(s){
-    return (s||"").replace(/[&<>"']/g, (c)=>({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    return (s || "").replace(/[&<>"']/g, (c)=>({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
     }[c]));
   }
 
   function normSpaces(s){
-    return (s||"").replace(/\s+/g," ").trim();
+    return (s || "").replace(/\s+/g," ").trim();
+  }
+
+  function normalizeNameKey(s){
+    return normSpaces(s || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^A-Z0-9 ]/gi, "")
+      .toUpperCase();
   }
 
   function cleanFieldValue(v){
     return normSpaces(v || "")
       .replace(/\s+(CPF|Código|Centro de Custo|Empresa|Admissão|CTPS|Série|Função|Cargo|Setor)\s*:.*$/i, "")
+      .replace(/\s+CNPJ\s*:.*$/i, "")
+      .replace(/\s+Local\s*:.*$/i, "")
+      .replace(/\s+Endere[cç]o\s*:.*$/i, "")
       .trim();
   }
 
@@ -590,6 +981,55 @@
       seen.add(k);
       return true;
     });
+  }
+
+  function getExtraPercentByContext(dayType, note){
+    const type = (dayType || "").toUpperCase();
+    const obs = (note || "").toUpperCase();
+
+    if(type === "DOMINGO") return "100%";
+    if(type === "SABADO") return "70%";
+    if(obs.includes("FERIADO")) return "100%";
+    return "50%";
+  }
+
+  function mergeEmployeeLists(lists){
+    const employeeMap = new Map();
+
+    lists.flat().forEach(current => {
+      const key = current.code || `${current.name}|${current.costCenter}|${current.company}`;
+
+      if(employeeMap.has(key)){
+        const old = employeeMap.get(key);
+        employeeMap.set(key, {
+          ...old,
+          name: old.name || current.name,
+          code: old.code || current.code,
+          costCenter: old.costCenter || current.costCenter,
+          company: old.company || current.company,
+          pin: old.pin || current.pin || "",
+          daysWorked: Math.max(old.daysWorked || 0, current.daysWorked || 0),
+          totalAbsences: Math.max(old.totalAbsences || 0, current.totalAbsences || 0),
+          unjustifiedAbsences: Math.max(old.unjustifiedAbsences || 0, current.unjustifiedAbsences || 0),
+          extrasOk: uniqueBy([...(old.extrasOk || []), ...(current.extrasOk || [])], x => `${x.date}|${x.time}`),
+          extrasBad: uniqueBy([...(old.extrasBad || []), ...(current.extrasBad || [])], x => `${x.date}|${x.time}`),
+          saturdayExtras: uniqueBy([...(old.saturdayExtras || []), ...(current.saturdayExtras || [])], x => `${x.date}|${x.time}`),
+          holidayExtras: uniqueBy([...(old.holidayExtras || []), ...(current.holidayExtras || [])], x => `${x.date}|${x.time}`),
+          absences: uniqueBy([...(old.absences || []), ...(current.absences || [])], x => x.date),
+          incompletePunches: uniqueBy([...(old.incompletePunches || []), ...(current.incompletePunches || [])], x => `${x.date}|${x.label}|${x.note}`)
+        });
+      } else {
+        employeeMap.set(key, current);
+      }
+    });
+
+    return [...employeeMap.values()].filter(e =>
+      (e.extrasBad && e.extrasBad.length > 0) ||
+      (e.saturdayExtras && e.saturdayExtras.length > 0) ||
+      (e.holidayExtras && e.holidayExtras.length > 0) ||
+      (e.unjustifiedAbsences || 0) >= CONSECUTIVE_ABSENCE_LIMIT ||
+      (e.incompletePunches && e.incompletePunches.length > 0)
+    );
   }
 
   function findLastPlannedIndex(clean){
@@ -761,15 +1201,36 @@
 
     const dayType = extractDayType(clean);
     const weekday = normalizeWeekdayName(extractWeekdayFromLine(clean));
+    const percentLabel = getExtraPercentByContext(dayType, clean);
 
     if(dayType === "SABADO"){
+      if(!punchInfo) return null;
+
+      const actualPunchCount = punchInfo.actualPunchCount || punchInfo.punches.length;
+      if(actualPunchCount !== 2) return null;
+      if(punchInfo.hasManualAdjustment) return null;
+
+      const saturdayExtraTime = punchInfo.saturdayExtraTime || "";
+      if(!saturdayExtraTime) return null;
+
+      return {
+        date,
+        time: saturdayExtraTime,
+        dayType,
+        weekday,
+        percentLabel
+      };
+    }
+
+    if(dayType === "DOMINGO"){
       const allTimes = clean.match(/\d{1,2}:\d{2}/g) || [];
       if(allTimes.length >= 3){
         return {
           date,
           time: allTimes[allTimes.length - 1],
           dayType,
-          weekday
+          weekday,
+          percentLabel
         };
       }
 
@@ -778,11 +1239,10 @@
           date,
           time: punchInfo.worked,
           dayType,
-          weekday
+          weekday,
+          percentLabel
         };
       }
-
-      return null;
     }
 
     if(punchInfo && punchInfo.punches.length <= 2){
@@ -802,7 +1262,8 @@
       date,
       time: positives[0],
       dayType,
-      weekday
+      weekday,
+      percentLabel
     };
   }
 
@@ -845,6 +1306,7 @@
     const signals = extractSignalsFromLine(clean);
     const dayType = extractDayType(clean);
     const weekday = normalizeWeekdayName(extractWeekdayFromLine(clean));
+    const hasManualAdjustment = /\(m\)/i.test(clean);
 
     if(/FALTA\s+NAO\s+JUSTIFICADA/i.test(clean)) return null;
 
@@ -855,7 +1317,10 @@
         worked: "",
         signals,
         dayType,
-        weekday
+        weekday,
+        actualPunchCount: 0,
+        saturdayExtraTime: "",
+        hasManualAdjustment
       };
     }
 
@@ -869,20 +1334,35 @@
         worked: "",
         signals,
         dayType,
-        weekday
+        weekday,
+        actualPunchCount: 0,
+        saturdayExtraTime: "",
+        hasManualAdjustment
       };
     }
 
-    if(dayType === "SABADO" && idxPrev < 0){
-      const punches = allTimes.slice(0, 2);
-      const worked = allTimes.length >= 3 ? allTimes[allTimes.length - 1] : "";
+    if(dayType === "SABADO"){
+      const punches = allTimes.slice(0, Math.min(2, allTimes.length));
+      let saturdayExtraTime = "";
+
+      if(!hasManualAdjustment && punches.length === 2){
+        if(allTimes.length === 3){
+          saturdayExtraTime = allTimes[2];
+        } else if(allTimes.length >= 4){
+          saturdayExtraTime = allTimes[allTimes.length - 1];
+        }
+      }
+
       return {
         date,
         punches,
-        worked,
+        worked: "",
         signals,
         dayType,
-        weekday
+        weekday,
+        actualPunchCount: punches.length,
+        saturdayExtraTime,
+        hasManualAdjustment
       };
     }
 
@@ -896,7 +1376,10 @@
         worked: "",
         signals,
         dayType,
-        weekday
+        weekday,
+        actualPunchCount: 0,
+        saturdayExtraTime: "",
+        hasManualAdjustment
       };
     }
 
@@ -910,7 +1393,17 @@
       worked = timesBefore[timesBefore.length - 1];
     }
 
-    return { date, punches, worked, signals, dayType, weekday };
+    return {
+      date,
+      punches,
+      worked,
+      signals,
+      dayType,
+      weekday,
+      actualPunchCount: punches.length,
+      saturdayExtraTime: "",
+      hasManualAdjustment
+    };
   }
 
   function initPdfJsOrShowError(){
@@ -921,9 +1414,7 @@
       return false;
     }
 
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "./vendor/pdfjs/pdf.worker.js";
-
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "./vendor/pdfjs/pdf.worker.js";
     return true;
   }
 
@@ -931,13 +1422,13 @@
     initPdfJsOrShowError();
   });
 
-  async function extractTextFromPdf(arrayBuffer){
+  async function extractTextFromPdf(arrayBuffer, fileIndex = 1, totalFiles = 1){
     const doc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const total = doc.numPages;
     const pages = [];
 
     for(let p = 1; p <= total; p++){
-      setLoading(true, "Carregando...", `Lendo página ${p} de ${total}`);
+      setLoading(true, "Carregando...", `PDF ${fileIndex}/${totalFiles} • Página ${p} de ${total}`);
 
       const page = await doc.getPage(p);
       const content = await page.getTextContent({ includeMarkedContent: true });
@@ -972,6 +1463,112 @@
     return pages.join("\n===PAGE_BREAK===\n");
   }
 
+
+  function extractEmployeeIdentityFromBlock(block){
+    const lines = block.split("\n").map(l => normSpaces(l)).filter(Boolean);
+    const employerSection =
+      block.match(/DADOS DO EMPREGADOR([\s\S]*?)DADOS DO COLABORADOR/i)?.[1] || "";
+
+    const employeeSection =
+      block.match(/DADOS DO COLABORADOR([\s\S]*)/i)?.[1] || block;
+
+    const mEmployerName = employerSection.match(/Nome\s*:\s*([^\n]+)/i);
+    const mName1 = employeeSection.match(/Nome\s*:\s*(.*?)\s+CPF\s*:/i);
+    const mName2 = employeeSection.match(/Nome\s*:\s*([^\n]+)/i);
+    const mCode = employeeSection.match(/(Código|Matr[ií]cula|Matricula)\s*[:\-]?\s*(\d{2,10})/i);
+    const mCC1 = employeeSection.match(/Centro de Custo\s*:\s*([^\n]+)/i);
+    const mCC2 = employeeSection.match(/Setor\s*:\s*([^\n]+)/i);
+    const mEmp1 = block.match(/Empresa\s*:\s*([^\n]+)/i);
+    const mEmp2 = block.match(/Raz[aã]o Social\s*:\s*([^\n]+)/i);
+
+    let name = cleanFieldValue((mName1?.[1] || mName2?.[1] || ""));
+    const code = (mCode?.[2] || "").trim();
+    const costCenter = cleanFieldValue((mCC1?.[1] || mCC2?.[1] || ""));
+    const company = cleanFieldValue(
+      mEmployerName?.[1] ||
+      mEmp1?.[1] ||
+      mEmp2?.[1] ||
+      ""
+    );
+
+    if(!name && code){
+      const idxCodeLine = lines.findIndex(l =>
+        new RegExp(`(Código|Matr[ií]cula|Matricula)\\s*[:\\-]?\\s*${code}`).test(l)
+      );
+      if(idxCodeLine > 0){
+        const candidate = lines[idxCodeLine - 1];
+        if(candidate && !/DADOS DO COLABORADOR/i.test(candidate)){
+          name = cleanFieldValue(candidate);
+        }
+      }
+    }
+
+    return { name, code, costCenter, company };
+  }
+
+  function parseEmployeeHeaders(text){
+    const pages = text.split("\n===PAGE_BREAK===\n").map(p => p.trim()).filter(Boolean);
+    const headers = [];
+    const seen = new Set();
+
+    for(const block of pages){
+      const identity = extractEmployeeIdentityFromBlock(block);
+      if(!identity.code) continue;
+      const key = identity.code || normalizeNameKey(identity.name);
+      if(seen.has(key)) continue;
+      seen.add(key);
+      headers.push(identity);
+    }
+
+    return headers;
+  }
+
+  function parsePinList(text){
+    const clean = normSpaces(text || "");
+    const afterPinHeader = clean.split(/\bPIN\b/i).slice(1).join(" ");
+    const base = afterPinHeader || clean;
+    return (base.match(/\b\d{4}\b/g) || []);
+  }
+
+  function applyPinsToEmployees(filteredEmployees, orderedHeaders, pinList){
+    if(!pinList.length || !orderedHeaders.length) return filteredEmployees;
+
+    const pinByCode = new Map();
+    const pinByName = new Map();
+
+    orderedHeaders.forEach((header, index) => {
+      const pin = (pinList[index] || "").trim();
+      if(!pin) return;
+
+      if(header.code) pinByCode.set(String(header.code).trim(), pin);
+      if(header.name) pinByName.set(normalizeNameKey(header.name), pin);
+    });
+
+    return (filteredEmployees || []).map(emp => ({
+      ...emp,
+      pin:
+        pinByCode.get(String(emp.code || "").trim()) ||
+        pinByName.get(normalizeNameKey(emp.name || "")) ||
+        emp.pin ||
+        ""
+    }));
+  }
+
+
+  function mergeOrderedHeaders(lists){
+    const headers = [];
+    const seen = new Set();
+
+    (lists || []).flat().forEach(item => {
+      const key = item.code || normalizeNameKey(item.name);
+      if(!key || seen.has(key)) return;
+      seen.add(key);
+      headers.push(item);
+    });
+
+    return headers;
+  }
+
   function parseEmployees(text){
     const pages = text.split("\n===PAGE_BREAK===\n").map(p => p.trim()).filter(Boolean);
     const employeeMap = new Map();
@@ -980,35 +1577,11 @@
       const lines = block.split("\n").map(l => normSpaces(l)).filter(Boolean);
       const period = extractPeriodMonth(block);
 
-      let name = "";
-      let code = "";
-      let costCenter = "";
-      let company = "";
-
-      const mName1 = block.match(/Nome\s*:\s*(.*?)\s+CPF\s*:/i);
-      const mName2 = block.match(/Nome\s*:\s*([^\n]+)/i);
-      name = cleanFieldValue((mName1?.[1] || mName2?.[1] || ""));
-
-      const mCode = block.match(/(Código|Matr[ií]cula|Matricula)\s*[:\-]?\s*(\d{2,10})/i);
-      code = (mCode?.[2] || "").trim();
-
-      const mCC1 = block.match(/Centro de Custo\s*:\s*([^\n]+)/i);
-      const mCC2 = block.match(/Setor\s*:\s*([^\n]+)/i);
-      costCenter = cleanFieldValue((mCC1?.[1] || mCC2?.[1] || ""));
-
-      const mEmp1 = block.match(/Empresa\s*:\s*([^\n]+)/i);
-      const mEmp2 = block.match(/Raz[aã]o Social\s*:\s*([^\n]+)/i);
-      company = cleanFieldValue((mEmp1?.[1] || mEmp2?.[1] || ""));
-
-      if(!name && code){
-        const idxCodeLine = lines.findIndex(l => new RegExp(`(Código|Matr[ií]cula|Matricula)\\s*[:\\-]?\\s*${code}`).test(l));
-        if(idxCodeLine > 0){
-          const candidate = lines[idxCodeLine - 1];
-          if(candidate && !/DADOS DO COLABORADOR/i.test(candidate)){
-            name = cleanFieldValue(candidate);
-          }
-        }
-      }
+      const identity = extractEmployeeIdentityFromBlock(block);
+      const name = identity.name || "";
+      const code = identity.code || "";
+      const costCenter = identity.costCenter || "";
+      const company = identity.company || "";
 
       if(!code) continue;
 
@@ -1053,12 +1626,14 @@
 
           const extra = extractExtraFromLine(line, punchInfo);
 
-          const saturdayWithTwoPunches = isSaturday && punchCount === 2;
-          const saturdayWithExtra = saturdayWithTwoPunches && (extra || punchInfo.worked);
+          const actualPunchCount = punchInfo.actualPunchCount || punchInfo.punches.length;
+          const saturdayManual = isSaturday && !!punchInfo.hasManualAdjustment;
+          const saturdayWithTwoPunches = isSaturday && actualPunchCount === 2 && !saturdayManual;
+          const saturdayWithExtra = saturdayWithTwoPunches && !!extra?.time;
 
           if(notes.length > 0){
             if(punchCount === 1 || punchCount === 2){
-              if(!saturdayWithExtra){
+              if(!saturdayWithExtra && !saturdayManual){
                 incompletePunches.push({
                   date: punchInfo.date,
                   weekday: punchInfo.weekday || "",
@@ -1077,7 +1652,7 @@
               });
             }
           } else if(punchCount === 1 || punchCount === 2){
-            if(!saturdayWithExtra){
+            if(!saturdayWithExtra && !saturdayManual){
               incompletePunches.push({
                 date: punchInfo.date,
                 weekday: punchInfo.weekday || "",
@@ -1089,13 +1664,18 @@
           }
 
           if(saturdayWithExtra){
-            const saturdayTime = extra?.time || punchInfo.worked || "";
+            const saturdayTime = extra?.time || "";
             if(saturdayTime){
+              const totalMin = hhmmToMinutes(saturdayTime);
+              const adjustedMin = Math.max(0, totalMin - 60);
+
               saturdayExtras.push({
                 date: punchInfo.date,
                 weekday: punchInfo.weekday || "",
                 time: saturdayTime,
-                note: "SÁBADO"
+                adjustedTime: minutesToHHMM(adjustedMin),
+                note: "AJUSTE FINAL",
+                percentLabel: "70%"
               });
             }
           }
@@ -1111,24 +1691,29 @@
                 label: "Batida incorreta",
                 note: notes.join(" • ")
               });
-            } else if((notes || []).includes("FERIADO")){
+            } else if((notes || []).includes("FERIADO") || extra.dayType === "DOMINGO"){
               holidayExtras.push({
                 date: extra.date,
                 weekday: extra.weekday || punchInfo.weekday || "",
                 time: extra.time,
-                note: "FERIADO"
+                note: extra.dayType === "DOMINGO" ? "DOMINGO" : "FERIADO",
+                percentLabel: "100%"
               });
             } else if(mins > EXTRA_LIMIT_MIN){
               extrasBad.push({
                 date: extra.date,
                 weekday: extra.weekday || punchInfo.weekday || "",
-                time: extra.time
+                time: extra.time,
+                dayType: extra.dayType || "NORMAL",
+                percentLabel: extra.percentLabel || "50%"
               });
             } else if(mins > 0){
               extrasOk.push({
                 date: extra.date,
                 weekday: extra.weekday || punchInfo.weekday || "",
-                time: extra.time
+                time: extra.time,
+                dayType: extra.dayType || "NORMAL",
+                percentLabel: extra.percentLabel || "50%"
               });
             }
           }
@@ -1136,10 +1721,10 @@
       }
 
       const absUnique = uniqueBy(absences, x => x.date);
-      const okUnique = uniqueBy(extrasOk, x => `${x.date}|${x.time}`);
-      const badUnique = uniqueBy(extrasBad, x => `${x.date}|${x.time}`);
-      const satUnique = uniqueBy(saturdayExtras, x => `${x.date}|${x.time}`);
-      const holidayUnique = uniqueBy(holidayExtras, x => `${x.date}|${x.time}`);
+      const okUnique = uniqueBy(extrasOk, x => `${x.date}|${x.time}|${x.percentLabel || ""}`);
+      const badUnique = uniqueBy(extrasBad, x => `${x.date}|${x.time}|${x.percentLabel || ""}`);
+      const satUnique = uniqueBy(saturdayExtras, x => `${x.date}|${x.time}|${x.percentLabel || ""}`);
+      const holidayUnique = uniqueBy(holidayExtras, x => `${x.date}|${x.time}|${x.percentLabel || ""}`);
       const incompleteUnique = uniqueBy(incompletePunches, x => `${x.date}|${x.label}|${x.note}`);
       const signalUnique = uniqueBy(signalDays, x => `${x.date}|${(x.signals||[]).join("|")}`);
 
@@ -1159,6 +1744,7 @@
         code,
         costCenter,
         company,
+        pin: "",
         daysWorked,
         totalAbsences,
         unjustifiedAbsences,
@@ -1177,13 +1763,14 @@
           name: old.name || current.name,
           costCenter: old.costCenter || current.costCenter,
           company: old.company || current.company,
+          pin: old.pin || current.pin || "",
           daysWorked: Math.max(old.daysWorked, current.daysWorked),
           totalAbsences: Math.max(old.totalAbsences, current.totalAbsences),
           unjustifiedAbsences: Math.max(old.unjustifiedAbsences, current.unjustifiedAbsences),
-          extrasOk: uniqueBy([...old.extrasOk, ...current.extrasOk], x => `${x.date}|${x.time}`),
-          extrasBad: uniqueBy([...old.extrasBad, ...current.extrasBad], x => `${x.date}|${x.time}`),
-          saturdayExtras: uniqueBy([...old.saturdayExtras, ...current.saturdayExtras], x => `${x.date}|${x.time}`),
-          holidayExtras: uniqueBy([...old.holidayExtras, ...current.holidayExtras], x => `${x.date}|${x.time}`),
+          extrasOk: uniqueBy([...old.extrasOk, ...current.extrasOk], x => `${x.date}|${x.time}|${x.percentLabel || ""}`),
+          extrasBad: uniqueBy([...old.extrasBad, ...current.extrasBad], x => `${x.date}|${x.time}|${x.percentLabel || ""}`),
+          saturdayExtras: uniqueBy([...old.saturdayExtras, ...current.saturdayExtras], x => `${x.date}|${x.time}|${x.percentLabel || ""}`),
+          holidayExtras: uniqueBy([...old.holidayExtras, ...current.holidayExtras], x => `${x.date}|${x.time}|${x.percentLabel || ""}`),
           absences: uniqueBy([...old.absences, ...current.absences], x => x.date),
           incompletePunches: uniqueBy([...old.incompletePunches, ...current.incompletePunches], x => `${x.date}|${x.label}|${x.note}`)
         });
@@ -1214,6 +1801,7 @@
       const exceedBy = minutesToHHMM(min - EXTRA_LIMIT_MIN);
       return `
         <div class="tile red">
+          <div class="he-percent">${escapeHtml(d.percentLabel || "50%")}</div>
           <div class="date">${escapeHtml(d.date)}${d.weekday ? ` • ${escapeHtml(d.weekday)}` : ``}</div>
           <div class="time">${escapeHtml(d.time)}</div>
           <div class="warn">⚠️ Excedeu ${escapeHtml(exceedBy)}</div>
@@ -1224,9 +1812,11 @@
     const saturdayTiles = (e.saturdayExtras || []).map(d=>{
       return `
         <div class="tile sat">
+          <div class="he-percent">${escapeHtml(d.percentLabel || "70%")}</div>
           <div class="date">${escapeHtml(d.date)}${d.weekday ? ` • ${escapeHtml(d.weekday)}` : ``}</div>
           <div class="time">${escapeHtml(d.time)}</div>
-          <div class="warn" style="color:#1d4ed8;">${escapeHtml(d.note || "SÁBADO")}</div>
+          <div class="warn" style="color:#1d4ed8;">${escapeHtml(d.note || "AJUSTE FINAL")}</div>
+          <div class="time">${escapeHtml(d.adjustedTime || d.time)}</div>
         </div>
       `;
     }).join("");
@@ -1234,6 +1824,7 @@
     const tilesOk = e.extrasOk.map(d=>{
       return `
         <div class="tile">
+          <div class="he-percent">${escapeHtml(d.percentLabel || "50%")}</div>
           <div class="date">${escapeHtml(d.date)}${d.weekday ? ` • ${escapeHtml(d.weekday)}` : ``}</div>
           <div class="time">${escapeHtml(d.time)}</div>
         </div>
@@ -1243,6 +1834,7 @@
     const holidayTiles = (e.holidayExtras || []).map(d=>{
       return `
         <div class="tile abs">
+          <div class="he-percent">${escapeHtml(d.percentLabel || "100%")}</div>
           <div class="date">${escapeHtml(d.date)}${d.weekday ? ` • ${escapeHtml(d.weekday)}` : ``}</div>
           <div class="time">${escapeHtml(d.time)}</div>
           <div class="warn" style="color:#8a4b00;">${escapeHtml(d.note || "FERIADO")}</div>
@@ -1252,10 +1844,10 @@
 
     const inconsistentTiles = (e.incompletePunches || []).map(d=>{
       return `
-        <div class="tile abs">
+        <div class="tile inc">
           <div class="date">${escapeHtml(d.date)}${d.weekday ? ` • ${escapeHtml(d.weekday)}` : ``}</div>
           <div class="time" style="font-size:14px;">${escapeHtml(d.label || "Batida incompleta")}</div>
-          ${d.note ? `<div class="warn" style="color:#8a4b00;">${escapeHtml(d.note)}</div>` : ``}
+          ${d.note ? `<div class="warn" style="color:var(--inc-tx);">${escapeHtml(d.note)}</div>` : ``}
         </div>
       `;
     }).join("");
@@ -1274,7 +1866,7 @@
       : ``;
 
     const inconsistentAlert = incompleteCount > 0
-      ? `<div class="alert abs">⚠️ ${incompleteCount} dia(s) com batida incompleta, inconsistência ou ocorrência registrada.</div>`
+      ? `<div class="alert inc">⚠️ ${incompleteCount} dia(s) com batida incompleta, inconsistência ou ocorrência registrada.</div>`
       : ``;
 
     const holidayAlert = holidayCount > 0 && !onlyHEFilter
@@ -1298,10 +1890,19 @@
         <div class="card-head">
           <div>
             <h2 class="name">${escapeHtml(e.name || "—")}</h2>
-            <div class="meta">
-              <div><span style="color:#7b8aa5; font-weight:800;">Código (matrícula):</span> <b>${escapeHtml(e.code || "—")}</b></div>
-              <div><span style="color:#7b8aa5; font-weight:800;">Centro de custo:</span> ${escapeHtml(e.costCenter || "—")}</div>
-              <div><span style="color:#7b8aa5; font-weight:800;">Empresa:</span> ${escapeHtml(e.company || "—")}</div>
+
+            <div class="meta-grid">
+              <div class="meta-label">Código (matrícula):</div>
+              <div class="meta-value">${escapeHtml(e.code || "—")}</div>
+
+              <div class="meta-label">PIN:</div>
+              <div class="meta-value"><span class="pin-destaque">${escapeHtml(e.pin || "—")}</span></div>
+
+              <div class="meta-label">Centro de custo:</div>
+              <div class="meta-value">${escapeHtml(e.costCenter || "—")}</div>
+
+              <div class="meta-label">Empresa:</div>
+              <div class="meta-value">${escapeHtml(e.company || "—")}</div>
             </div>
           </div>
 
@@ -1309,11 +1910,10 @@
             <span class="badge badge-red">⏱ ${exceedCount} dia(s) HE excedida</span>
             ${saturdayCount > 0 ? `<span class="badge badge-sat">🔵 ${saturdayCount} HE sábado</span>` : ``}
             <span class="badge badge-abs">🟡 ${e.unjustifiedAbsences ?? 0} faltas injust. consecutivas</span>
-            ${incompleteCount > 0 ? `<span class="badge badge-abs">🕒 ${incompleteCount} batidas/ocorrências</span>` : ``}
+            ${incompleteCount > 0 ? `<span class="badge badge-inc">🕒 ${incompleteCount} batidas/ocorrências</span>` : ``}
             ${holidayCount > 0 ? `<span class="badge badge-abs">🎉 ${holidayCount} extras feriado</span>` : ``}
 
-            <button class="btn-ghost" style="padding:8px 10px;border-radius:999px;"
-              data-open="${idx}" title="Expandir/Recolher">
+            <button class="btn-ghost" style="padding:8px 10px;border-radius:999px;" data-open="${idx}" title="Expandir/Recolher">
               <span class="chev open" data-chev="${idx}">⌄</span>
             </button>
           </div>
@@ -1355,7 +1955,6 @@
           </div>
 
           <div data-pane="${idx}-horas">
-            <div class="sub" style="margin:10px 0 0;">Verde = OK • Vermelho = Excedeu (&gt; ${EXTRA_LIMIT_LABEL}) • Azul = Sábado</div>
             <div class="grid">
               ${hoursGridHtml}
             </div>
@@ -1363,14 +1962,12 @@
             ${saturdayAlert}
 
             ${(!onlyHEFilter && holidayTiles) ? `
-              <div class="sub" style="margin:14px 0 0;">Amarelo = Extras em feriado</div>
               <div class="grid">${holidayTiles}</div>
             ` : ``}
             ${holidayAlert}
           </div>
 
           <div data-pane="${idx}-faltas" style="display:none;">
-            <div class="sub" style="margin:10px 0 0;">Amarelo = Faltas (datas encontradas no PDF)</div>
             <div class="grid">
               ${faltasTiles || `<div class="meta">Sem dias de faltas detectados no texto do PDF.</div>`}
             </div>
@@ -1378,7 +1975,6 @@
           </div>
 
           <div data-pane="${idx}-incons" style="display:none;">
-            <div class="sub" style="margin:10px 0 0;">Amarelo = Batidas incompletas / inconsistentes / ocorrências</div>
             <div class="grid">
               ${inconsistentTiles || `<div class="meta">Sem inconsistências detectadas no texto do PDF.</div>`}
             </div>
@@ -1390,6 +1986,7 @@
   }
 
   let allEmployees = [];
+  let currentPinFile = null;
 
   function render(employees){
     const term = normSpaces(($("searchEmployee")?.value || "")).toLowerCase();
@@ -1507,6 +2104,7 @@
       resumo.push({
         "Nome": emp.name || "",
         "Matrícula": emp.code || "",
+        "PIN": emp.pin || "",
         "Centro de Custo": emp.costCenter || "",
         "Empresa": emp.company || "",
         "Dias Trabalhados": emp.daysWorked ?? 0,
@@ -1523,11 +2121,13 @@
         heExcedidas.push({
           "Nome": emp.name || "",
           "Matrícula": emp.code || "",
+          "PIN": emp.pin || "",
           "Centro de Custo": emp.costCenter || "",
           "Empresa": emp.company || "",
           "Data": item.date || "",
           "Dia da Semana": item.weekday || "",
           "Hora Extra": item.time || "",
+          "Percentual HE": item.percentLabel || "50%",
           "Limite": EXTRA_LIMIT_LABEL,
           "Excedido em": mins > EXTRA_LIMIT_MIN ? minutesToHHMM(mins - EXTRA_LIMIT_MIN) : "00:00"
         });
@@ -1537,11 +2137,13 @@
         heSabado.push({
           "Nome": emp.name || "",
           "Matrícula": emp.code || "",
+          "PIN": emp.pin || "",
           "Centro de Custo": emp.costCenter || "",
           "Empresa": emp.company || "",
           "Data": item.date || "",
           "Dia da Semana": item.weekday || "",
           "Hora": item.time || "",
+          "Percentual HE": item.percentLabel || "70%",
           "Observação": item.note || "SÁBADO"
         });
       });
@@ -1550,11 +2152,13 @@
         heFeriado.push({
           "Nome": emp.name || "",
           "Matrícula": emp.code || "",
+          "PIN": emp.pin || "",
           "Centro de Custo": emp.costCenter || "",
           "Empresa": emp.company || "",
           "Data": item.date || "",
           "Dia da Semana": item.weekday || "",
           "Hora": item.time || "",
+          "Percentual HE": item.percentLabel || "100%",
           "Observação": item.note || "FERIADO"
         });
       });
@@ -1563,6 +2167,7 @@
         faltas.push({
           "Nome": emp.name || "",
           "Matrícula": emp.code || "",
+          "PIN": emp.pin || "",
           "Centro de Custo": emp.costCenter || "",
           "Empresa": emp.company || "",
           "Data": item.date || "",
@@ -1575,6 +2180,7 @@
         inconsistencias.push({
           "Nome": emp.name || "",
           "Matrícula": emp.code || "",
+          "PIN": emp.pin || "",
           "Centro de Custo": emp.costCenter || "",
           "Empresa": emp.company || "",
           "Data": item.date || "",
@@ -1629,7 +2235,6 @@
     }
   }
 
-  let currentFile = null;
 
   $("searchEmployee").addEventListener("input", ()=>{
     render(allEmployees);
@@ -1640,19 +2245,19 @@
   });
 
   $("pdfFile").addEventListener("change", (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
+    const files = Array.from(e.target.files || []);
+    if(!files.length) return;
 
     if(!initPdfJsOrShowError()){
-      currentFile = null;
+      currentFiles = [];
       $("pdfFile").value = "";
       return;
     }
 
-    const isPdf = f.name.toLowerCase().endsWith(".pdf");
-    if(!isPdf){
-      currentFile = null;
-      setMsg("Selecione um arquivo PDF válido.");
+    const invalid = files.find(f => !f.name.toLowerCase().endsWith(".pdf"));
+    if(invalid){
+      currentFiles = [];
+      setMsg("Selecione apenas arquivos PDF válidos.");
       $("btnAnalyze").disabled = true;
       $("btnAnalyze").classList.add("btn-disabled");
       $("btnExcel").disabled = true;
@@ -1660,16 +2265,44 @@
       return;
     }
 
-    currentFile = f;
-    setMsg("PDF selecionado: " + f.name);
+    currentFiles = files;
+    setMsg(`${files.length} PDF(s) da folha selecionado(s).${currentPinFile ? ` PDF PIN: ${currentPinFile.name}.` : ""}`);
     $("btnAnalyze").disabled = false;
     $("btnAnalyze").classList.remove("btn-disabled");
   });
 
+
+  $("pinPdfFile").addEventListener("change", (e)=>{
+    const file = (e.target.files || [])[0] || null;
+
+    if(!file){
+      currentPinFile = null;
+      return;
+    }
+
+    if(!initPdfJsOrShowError()){
+      currentPinFile = null;
+      $("pinPdfFile").value = "";
+      return;
+    }
+
+    if(!file.name.toLowerCase().endsWith(".pdf")){
+      currentPinFile = null;
+      $("pinPdfFile").value = "";
+      setMsg("O arquivo de PIN precisa ser um PDF válido.");
+      return;
+    }
+
+    currentPinFile = file;
+    setMsg(`PDF(s) da folha: ${currentFiles.length || 0} • PDF PIN: ${file.name}`);
+  });
+
   $("btnClear").addEventListener("click", ()=>{
-    currentFile = null;
+    currentFiles = [];
     allEmployees = [];
+    currentPinFile = null;
     $("pdfFile").value = "";
+    $("pinPdfFile").value = "";
     $("searchEmployee").value = "";
     $("statusFilter").value = "all";
     $("cards").innerHTML = "";
@@ -1681,29 +2314,55 @@
   });
 
   $("btnAnalyze").addEventListener("click", async ()=>{
-    if(!currentFile) return;
-
+    if(!currentFiles.length) return;
     if(!initPdfJsOrShowError()) return;
 
     setLoading(true, "Carregando...", "Preparando leitura...");
     setMsg("Carregando...");
 
     try{
-      const buf = await currentFile.arrayBuffer();
-      const text = await extractTextFromPdf(buf);
+      const resultsPerPdf = [];
+      const headersPerPdf = [];
 
-      setLoading(true, "Carregando...", "Interpretando dados...");
-      const employees = parseEmployees(text);
-      allEmployees = employees;
+      for(let i = 0; i < currentFiles.length; i++){
+        const file = currentFiles[i];
+        setLoading(true, "Carregando...", `Lendo arquivo ${i + 1} de ${currentFiles.length}: ${file.name}`);
+
+        const buf = await file.arrayBuffer();
+        const text = await extractTextFromPdf(buf, i + 1, currentFiles.length);
+
+        setLoading(true, "Carregando...", `Interpretando dados do arquivo ${i + 1} de ${currentFiles.length}`);
+        const employees = parseEmployees(text);
+        const headers = parseEmployeeHeaders(text);
+
+        resultsPerPdf.push(employees);
+        headersPerPdf.push(headers);
+      }
+
+      allEmployees = mergeEmployeeLists(resultsPerPdf);
+
+      let pinCount = 0;
+      if(currentPinFile){
+        setLoading(true, "Carregando...", `Lendo PDF de PIN: ${currentPinFile.name}`);
+        const pinBuf = await currentPinFile.arrayBuffer();
+        const pinText = await extractTextFromPdf(pinBuf, 1, 1);
+        const pinList = parsePinList(pinText);
+        const orderedHeaders = mergeOrderedHeaders(headersPerPdf);
+        allEmployees = applyPinsToEmployees(allEmployees, orderedHeaders, pinList);
+        pinCount = allEmployees.filter(emp => emp.pin).length;
+      }
+
       render(allEmployees);
 
       $("btnExcel").disabled = allEmployees.length === 0;
       $("btnExcel").classList.toggle("btn-disabled", allEmployees.length === 0);
 
-      setMsg(allEmployees.length ? "Análise concluída com sucesso." : "Nenhum colaborador encontrado para as regras definidas.");
+      setMsg(allEmployees.length
+        ? `Análise concluída com sucesso. ${currentFiles.length} PDF(s) da folha processado(s).${currentPinFile ? ` PIN encontrado para ${pinCount} colaborador(es) exibido(s).` : ""}`
+        : "Nenhum colaborador encontrado para as regras definidas.");
     }catch(err){
       console.error(err);
-      setMsg("Erro ao analisar o PDF. (Se o PDF for escaneado como imagem, precisa OCR.)");
+      setMsg("Erro ao analisar os PDFs. (Se algum PDF for escaneado como imagem, precisa OCR.)");
       $("btnExcel").disabled = true;
       $("btnExcel").classList.add("btn-disabled");
     }finally{
@@ -1712,6 +2371,20 @@
   });
 
   $("btnExcel").addEventListener("click", exportExcel);
+
+  const legendOverlay = $("legendOverlay");
+
+  $("btnLegend").addEventListener("click", () => {
+    legendOverlay.classList.toggle("active");
+  });
+
+  $("closeLegend").addEventListener("click", () => {
+    legendOverlay.classList.remove("active");
+  });
+
+  $("btnCloseLegend").addEventListener("click", () => {
+    legendOverlay.classList.remove("active");
+  });
 </script>
 </body>
 </html>
